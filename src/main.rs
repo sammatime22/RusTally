@@ -56,6 +56,7 @@ fn interpret_input(key: &str, value: &str, table: &mut HashMap<String, i32>) {
     if !(*table).contains_key(&key.to_string()) {
         (*table).insert(key.to_string(), evaluate_value(value));
     } else {
+        // Get rid of "Some"
         if let Some(key_value) = (*table).get_mut(key) {
             *key_value += evaluate_value(value);
         }
@@ -88,7 +89,7 @@ fn gather_input(key: &mut String, value: &mut String) -> bool {
     let mut input = String::new();
     stdin().read_line(&mut input).unwrap();
 
-    let split_input = input.trim_right().split(|c| (c == ' ')).collect::<Vec<&str>>();
+    let split_input = input.trim_end().split(|c| (c == ' ')).collect::<Vec<&str>>();
 
     // Potentially a valid meta command
     if split_input.len() == 1 {
