@@ -1,5 +1,6 @@
 // Imports
 use std::collections::HashMap;
+use std::env::{args};
 use std::io::{stdout, stdin, Write};
 use std::process::{exit};
 
@@ -11,6 +12,8 @@ const SAVE:&str = "SAVE";
 const NO_ERROR_EXIT:i32 = 0;
 
 // Input Positions
+const FILENAME_PROVIDED:usize = 0;
+const FILENAME_POS:usize = 1;
 const META_COMMAND_POS:usize = 0;
 const KEY_POS:usize = 0;
 const VALUE_POS:usize = 1;
@@ -56,19 +59,18 @@ fn interpret_input(key: &str, value: &str, table: &mut HashMap<String, i32>) {
     if !(*table).contains_key(&key.to_string()) {
         (*table).insert(key.to_string(), evaluate_value(value));
     } else {
-        // Get rid of "Some"
         if let Some(key_value) = (*table).get_mut(key) {
             *key_value += evaluate_value(value);
         }
     }
 
-    definite_print(format!("New Value: {}: {:?}", key, (*table).get(key)), true);
+    definite_print(format!("New Value: {}: {:?}", key, (*table).get(key).unwrap()), true);
 }
 
 /**
  * Loads the data into the table from a provided save file name.
  */
-fn load_data() {
+fn load_data(filename: String, table: &mut HashMap<String, i32>) {
 
 }
 
@@ -118,10 +120,14 @@ fn gather_input(key: &mut String, value: &mut String) -> bool {
  * The main method.
  */
 fn main() {
-    // If file provided, load it into the class definied struct
-    
     // Our Table
     let mut table:HashMap<String, i32> = HashMap::new();
+
+    // If file provided, load it into the class definied struct
+    let args: Vec<String> = args().collect();
+    if args.len() == FILENAME_PROVIDED {
+        load_data(args[FILENAME_POS], &mut table);
+    }
 
     let mut key = String::new();
     let mut value = String::new();
