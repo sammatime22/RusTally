@@ -98,6 +98,7 @@ fn gather_input(key: &mut String, value: &mut String) -> bool {
         if EXIT.to_string().eq(split_input[META_COMMAND_POS]) {
             exit(NO_ERROR_EXIT);
         } else if SAVE.to_string().eq(split_input[META_COMMAND_POS]) {
+            // Ask for filename to save to 
             save_data();
         } else {
             definite_print(
@@ -126,7 +127,8 @@ fn main() {
     // If file provided, load it into the class definied struct
     let args: Vec<String> = args().collect();
     if args.len() == FILENAME_PROVIDED {
-        load_data(args[FILENAME_POS], &mut table);
+        let ref filename = &args[FILENAME_POS];
+        load_data((*filename).to_string(), &mut table);
     }
 
     let mut key = String::new();
