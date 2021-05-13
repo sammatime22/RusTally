@@ -77,7 +77,7 @@ fn load_data(filename: String, table: &mut HashMap<String, i32>) {
 /**
  * Saves the data from the table into a provided save file name.
  */
-fn save_data() {
+fn save_data(filename: String) {
 
 }
 
@@ -99,7 +99,10 @@ fn gather_input(key: &mut String, value: &mut String) -> bool {
             exit(NO_ERROR_EXIT);
         } else if SAVE.to_string().eq(split_input[META_COMMAND_POS]) {
             // Ask for filename to save to 
-            save_data();
+            definite_print(format!("Please provide the filename, no extensions: "), false);
+            let mut filename = String::new();
+            stdin().read_line(&mut filename).unwrap();
+            save_data(filename);
         } else {
             definite_print(
                 format!("Meta Command {} Not Comprehendable", split_input[META_COMMAND_POS]), true
