@@ -1,6 +1,7 @@
 // Imports
 use std::collections::HashMap;
 use std::env::{args};
+use std::fs;
 use std::io::{stdout, stdin, Write};
 use std::process::{exit};
 
@@ -71,7 +72,19 @@ fn interpret_input(key: &str, value: &str, table: &mut HashMap<String, i32>) {
  * Loads the data into the table from a provided save file name.
  */
 fn load_data(filename: String, table: &mut HashMap<String, i32>) {
+    let content = fs::read_to_string(filename);
 
+    let seperated_lines = content.lines();
+
+    for line in seperated_lines {
+        let split_line = line.split(|c| (c == ':')).collect::<Vec<&str>>();
+
+        if split_line.len() == 2 {
+            interpret_input(split_line[KEY_POS], split_line[VALUE_POS], table);
+        }
+    }
+
+    definite_print(format!("Finished loading {}", filename), false);
 }
 
 /**
