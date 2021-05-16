@@ -1,8 +1,8 @@
 // Imports
 use std::collections::HashMap;
 use std::env::{args};
-use std::fs;
-use std::io::{stdout, stdin, Write};
+use std::fs::{File};
+use std::io::{BufRead, BufReader, stdout, stdin, Write};
 use std::process::{exit};
 
 // Meta Commands
@@ -71,13 +71,14 @@ fn interpret_input(key: &str, value: &str, table: &mut HashMap<String, i32>) {
 /**
  * Loads the data into the table from a provided save file name.
  */
-fn load_data(filename: String, table: &mut HashMap<String, i32>) {
-    let content = fs::read_to_string(filename);
+fn load_data(filename: &str, table: &mut HashMap<String, i32>) {
+    let file = File::open(filename.to_string()).unwrap();
 
-    let seperated_lines = content.lines();
+    let file_reader = BufReader::new(file);
 
-    for line in seperated_lines {
-        let split_line = line.split(|c| (c == ':')).collect::<Vec<&str>>();
+    for line in file_reader.lines() {
+        let unwrapped_line = line.unwrap();
+        let split_line = unwrapped_line.split(|c| (c == ':')).collect::<Vec<&str>>();
 
         if split_line.len() == 2 {
             interpret_input(split_line[KEY_POS], split_line[VALUE_POS], table);
@@ -88,10 +89,21 @@ fn load_data(filename: String, table: &mut HashMap<String, i32>) {
 }
 
 /**
- * Saves the data from the table into a provided save file name.
+ * Saves the data from the table into a provided save file name. This will overwrite the provided filename.
  */
-fn save_data(filename: String) {
+fn save_data(filename: &str, table: &mut HashMap<String, i32>) {
+    let mut file = File::create(filename);
 
+    for (key, value) in table.iter() {
+        let mut value_signage = "";
+        if *value > 0 {
+            value_signage = "+";
+        }
+        let line = format!("{}:{}{}", key, value_signage, value);
+        writeln!(&mut file, "{}", line.to_string());
+    }
+
+    definite_print(format!("Finished writing {}", filename), false);
 }
 
 /**
@@ -115,7 +127,8 @@ fn gather_input(key: &mut String, value: &mut String) -> bool {
             definite_print(format!("Please provide the filename, no extensions: "), false);
             let mut filename = String::new();
             stdin().read_line(&mut filename).unwrap();
-            save_data(filename);
+            *key = SAVE.to_string();
+            *value = filename;
         } else {
             definite_print(
                 format!("Meta Command {} Not Comprehendable", split_input[META_COMMAND_POS]), true
@@ -143,8 +156,8 @@ fn main() {
     // If file provided, load it into the class definied struct
     let args: Vec<String> = args().collect();
     if args.len() == FILENAME_PROVIDED {
-        let ref filename = &args[FILENAME_POS];
-        load_data((*filename).to_string(), &mut table);
+        let ref filename = *args[FILENAME_POS];
+        load_data(filename, &mut table);
     }
 
     let mut key = String::new();
@@ -153,8 +166,12 @@ fn main() {
     // Main Loop, will have to turn this into a separate class in the near future.
     loop {
         if gather_input(&mut key, &mut value) {
-            definite_print(format!("Provided Key {} : Value {}", key, value), true);
-            interpret_input(&key, &value, &mut table);
+            if !(SAVE.to_string().eq(&key)) {
+                definite_print(format!("Provided Key {} : Value {}", key, value), true);
+                interpret_input(&key, &value, &mut table);
+            } else {
+                save_data(&value, &mut table);
+            }
         }
     }
 }
