@@ -1,7 +1,7 @@
 // Imports
 use std::collections::HashMap;
 use std::env::{args};
-use std::fs::{File};
+use std::fs::{File, write};
 use std::io::{BufRead, BufReader, stdout, stdin, Write};
 use std::process::{exit};
 
@@ -100,7 +100,7 @@ fn save_data(filename: &str, table: &mut HashMap<String, i32>) {
             value_signage = "+";
         }
         let line = format!("{}:{}{}", key, value_signage, value);
-        writeln!(&mut file, "{}", line.to_string());
+        write(file, line.to_string());
     }
 
     definite_print(format!("Finished writing {}", filename), false);
