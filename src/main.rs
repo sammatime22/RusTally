@@ -1,7 +1,7 @@
 // Imports
 use std::collections::HashMap;
 use std::env::{args};
-use std::fs::{File, write};
+use std::fs::{File};
 use std::io::{BufRead, BufReader, stdout, stdin, Write};
 use std::process::{exit};
 
@@ -92,7 +92,10 @@ fn load_data(filename: &str, table: &mut HashMap<String, i32>) {
  * Saves the data from the table into a provided save file name. This will overwrite the provided filename.
  */
 fn save_data(filename: &str, table: &mut HashMap<String, i32>) {
-    let mut file = File::create(filename);
+    let mut file = match File::create(filename) {
+        Err(why) => panic!("couldn't create {}, {}", filename, why),
+        Ok(file) => file,
+    };
 
     for (key, value) in table.iter() {
         let mut value_signage = "";
@@ -100,7 +103,10 @@ fn save_data(filename: &str, table: &mut HashMap<String, i32>) {
             value_signage = "+";
         }
         let line = format!("{}:{}{}", key, value_signage, value);
-        write(file, line.to_string());
+        match file.write_all(line.as_bytes()) {
+            Err(why) => panic!("Couldn't write {}, {}", line, why),
+            Ok(_) => definite_print(format!("Wrote {}", line), true),
+        };
     }
 
     definite_print(format!("Finished writing {}", filename), false);
