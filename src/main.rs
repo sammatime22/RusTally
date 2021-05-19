@@ -5,6 +5,9 @@ use std::fs::{File};
 use std::io::{BufRead, BufReader, stdout, stdin, Write};
 use std::process::{exit};
 
+// File Extensions
+const SYAML:&str = "syaml";
+
 // Meta Commands
 const EXIT:&str = "EXIT";
 const SAVE:&str = "SAVE";
@@ -92,7 +95,7 @@ fn load_data(filename: &str, table: &mut HashMap<String, i32>) {
  * Saves the data from the table into a provided save file name. This will overwrite the provided filename.
  */
 fn save_data(filename: &str, table: &mut HashMap<String, i32>) {
-    let mut file = match File::create(filename) {
+    let mut file = match File::create(format!("{}.{}", filename, SYAML)) {
         Err(why) => panic!("couldn't create {}, {}", filename, why),
         Ok(file) => file,
     };
@@ -134,7 +137,8 @@ fn gather_input(key: &mut String, value: &mut String) -> bool {
             let mut filename = String::new();
             stdin().read_line(&mut filename).unwrap();
             *key = SAVE.to_string();
-            *value = filename;
+            *value = filename.to_string().trim_end().to_string();
+            return true;
         } else {
             definite_print(
                 format!("Meta Command {} Not Comprehendable", split_input[META_COMMAND_POS]), true
@@ -176,6 +180,7 @@ fn main() {
                 definite_print(format!("Provided Key {} : Value {}", key, value), true);
                 interpret_input(&key, &value, &mut table);
             } else {
+                definite_print("Saving...".to_string(), true);
                 save_data(&value, &mut table);
             }
         }
