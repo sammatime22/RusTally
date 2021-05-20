@@ -16,7 +16,7 @@ const SAVE:&str = "SAVE";
 const NO_ERROR_EXIT:i32 = 0;
 
 // Input Positions
-const FILENAME_PROVIDED:usize = 0;
+const FILENAME_PROVIDED:usize = 2;
 const FILENAME_POS:usize = 1;
 const META_COMMAND_POS:usize = 0;
 const KEY_POS:usize = 0;
@@ -88,7 +88,7 @@ fn load_data(filename: &str, table: &mut HashMap<String, i32>) {
         }
     }
 
-    definite_print(format!("Finished loading {}", filename), false);
+    definite_print(format!("Finished loading {}", filename), true);
 }
 
 /**
@@ -112,7 +112,7 @@ fn save_data(filename: &str, table: &mut HashMap<String, i32>) {
         };
     }
 
-    definite_print(format!("Finished writing {}", filename), false);
+    definite_print(format!("Finished writing {}", filename), true);
 }
 
 /**
